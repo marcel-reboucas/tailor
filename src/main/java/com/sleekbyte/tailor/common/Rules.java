@@ -1,5 +1,7 @@
 package com.sleekbyte.tailor.common;
 
+
+import com.sleekbyte.tailor.listeners.MscrMetricsListener;
 import com.sleekbyte.tailor.listeners.BlankLineListener;
 import com.sleekbyte.tailor.listeners.BraceStyleListener;
 import com.sleekbyte.tailor.listeners.ConstantNamingListener;
@@ -56,7 +58,8 @@ public enum Rules {
     TODO_SYNTAX,
     TRAILING_CLOSURE,
     TRAILING_WHITESPACE,
-    UPPER_CAMEL_CASE;
+    UPPER_CAMEL_CASE,
+    MSCR_METRICS;
 
     private static final String BASE_STYLE_GUIDE_LINK = "https://github.com/sleekbyte/tailor/wiki/Rules#";
     public static final int REMEDIATION_POINTS = 50000;
@@ -295,5 +298,11 @@ public enum Rules {
         UPPER_CAMEL_CASE.examples = RuleExamples.get(UPPER_CAMEL_CASE.name);
         UPPER_CAMEL_CASE.className = UpperCamelCaseListener.class.getName();
         UPPER_CAMEL_CASE.category = RuleCategory.STYLE;
+       
+        MSCR_METRICS.name = "mscr-metrics";
+        MSCR_METRICS.description = "Collects general code metrics";
+        MSCR_METRICS.examples = RuleExamples.get(MSCR_METRICS.name);
+        MSCR_METRICS.className = MscrMetricsListener.class.getName();
+        MSCR_METRICS.category = RuleCategory.BUG_RISK;
     }
 }
