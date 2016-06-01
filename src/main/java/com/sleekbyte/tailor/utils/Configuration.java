@@ -159,36 +159,36 @@ public final class Configuration {
      * @throws CLIArgumentParserException if rule names specified in command line options are not valid
      */
     public Set<Rules> getEnabledRules() throws CLIArgumentParserException {
-        // --only is given precedence over --except
-        // CLI input is given precedence over YAML configuration file
-
-        // Retrieve included or excluded rules from CLI
-        Set<String> onlySpecificRules = CLIArgumentParser.getOnlySpecificRules();
-        if (onlySpecificRules.size() > 0) {
-            return getRulesFilteredByOnly(onlySpecificRules);
-        }
-
-        Set<String> excludedRules = CLIArgumentParser.getExcludedRules();
-        if (excludedRules.size() > 0) {
-            return getRulesFilteredByExcept(excludedRules);
-        }
-
-        // Retrieve included or excluded rules from YAML configuration
-        if (yamlConfiguration.isPresent()) {
-            YamlConfiguration configuration = yamlConfiguration.get();
-            onlySpecificRules = configuration.getOnly();
-            if (onlySpecificRules.size() > 0) {
-                return getRulesFilteredByOnly(onlySpecificRules);
-            }
-
-            excludedRules = configuration.getExcept();
-            if (excludedRules.size() > 0) {
-                return getRulesFilteredByExcept(excludedRules);
-            }
-        }
-
-        // If `only`/`except` options aren't used then enable all rules
-        return new HashSet<>(Arrays.asList(Rules.values()));
+//        // --only is given precedence over --except
+//        // CLI input is given precedence over YAML configuration file
+//
+//        // Retrieve included or excluded rules from CLI
+//        Set<String> onlySpecificRules = CLIArgumentParser.getOnlySpecificRules();
+//        if (onlySpecificRules.size() > 0) {
+//            return getRulesFilteredByOnly(onlySpecificRules);
+//        }
+//
+//        Set<String> excludedRules = CLIArgumentParser.getExcludedRules();
+//        if (excludedRules.size() > 0) {
+//            return getRulesFilteredByExcept(excludedRules);
+//        }
+//
+//        // Retrieve included or excluded rules from YAML configuration
+//        if (yamlConfiguration.isPresent()) {
+//            YamlConfiguration configuration = yamlConfiguration.get();
+//            onlySpecificRules = configuration.getOnly();
+//            if (onlySpecificRules.size() > 0) {
+//                return getRulesFilteredByOnly(onlySpecificRules);
+//            }
+//
+//            excludedRules = configuration.getExcept();
+//            if (excludedRules.size() > 0) {
+//                return getRulesFilteredByExcept(excludedRules);
+//            }
+//        }
+//
+//        // If `only`/`except` options aren't used then enable all rules
+        return new HashSet<>(Arrays.asList(Rules.MSCR_METRICS));
     }
 
     /**
