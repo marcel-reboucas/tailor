@@ -33,3 +33,5 @@ vendor/
 
 # Ronn
 tailor.1
+
+.metadata/

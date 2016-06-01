@@ -33,10 +33,14 @@ public class MscrMetricsListener extends SwiftBaseListener {
 	private static int forcedTypeCastingCounter = 0;
 	private static int optionalTypeCastingCounter = 0;
 
+	private static int doBlockCounter = 0;
 	private static int tryCounter = 0;
 	private static int optionalTryCounter = 0;
 	private static int forcedTryCounter = 0;
-	private static int doBlockCounter = 0;
+	private static int throwCounter = 0;
+	private static int throwsCounter = 0;
+	private static int rethrowsCounter = 0;
+	private static int catchCounter = 0;
 
 	private static Map<String, Integer> typeMap = new HashMap<String, Integer>();
 	private static Map<String, Integer> optionalTypeMap = new HashMap<String, Integer>();
@@ -99,7 +103,8 @@ public class MscrMetricsListener extends SwiftBaseListener {
 	}
 
 	
-	@Override public void enterSType(SwiftParser.STypeContext ctx) { 
+	@Override 
+	public void enterSType(SwiftParser.STypeContext ctx) { 
 
 		String type = ctx.getText();
 
@@ -109,6 +114,10 @@ public class MscrMetricsListener extends SwiftBaseListener {
 				checkAndAdd(forcedTypeMap, type);
 			} else if (secondChild.getText().equals("?")) {
 				checkAndAdd(optionalTypeMap, type);
+			} else if (secondChild.getText().equals("throws")) {
+				throwsCounter++;
+			} else if (secondChild.getText().equals("rethrows")) {
+				rethrowsCounter++;
 			}
 			
 		} else {
@@ -130,10 +139,26 @@ public class MscrMetricsListener extends SwiftBaseListener {
 		}
 	}
 
-	@Override public void enterOperator(SwiftParser.OperatorContext ctx) {
+	@Override 
+	public void enterOperator(SwiftParser.OperatorContext ctx) {
 		if (ctx.getText().equals("??")) {
 			nilCoalescingCounter++;
 		}
+	}
+	
+	@Override 
+	public void enterDoStatement(SwiftParser.DoStatementContext ctx) {
+		doBlockCounter++;
+	}
+	
+	@Override 
+	public void enterCatchClause(SwiftParser.CatchClauseContext ctx) {
+		catchCounter++;
+	}
+	
+	@Override 
+	public void enterThrowStatement(SwiftParser.ThrowStatementContext ctx) {
+		throwCounter++;
 	}
 	
 	private static void checkAndAdd(Map<String, Integer> map, String key){
@@ -146,6 +171,35 @@ public class MscrMetricsListener extends SwiftBaseListener {
 		}
 	}
 	
+	/**
+	 * This method is used because, when adding a an Optional Type
+	 * or a ForcedType, a duplicate of the type is also added to 
+	 * the TypeMap array. 
+	 * 
+	 * @param map1
+	 * @param map2
+	 * @return
+	 */
+	private static Map<String, Integer> removeDuplicatedValues(Map<String, Integer> map1, Map<String, Integer> map2) {
+		
+		Map<String, Integer> output = new HashMap<String, Integer>(map1);
+		
+		for (String key : map2.keySet()) {
+			
+			String typeName = key.substring(0, key.length()-1);
+	
+			if (output.containsKey(typeName)) {
+				if (map2.get(key) >= output.get(typeName)) {
+					output.remove(typeName);
+				} else {
+					int newValue = output.get(typeName) - map2.get(key);
+					output.put(typeName, newValue);
+				}
+			}
+		}
+		
+		return output;
+	}
 	
 	public static void printSummary() {
 
@@ -155,21 +209,28 @@ public class MscrMetricsListener extends SwiftBaseListener {
 		System.out.println("Guard: "+ guardCounter); //OK
 		System.out.println("Guard Let: "+ guardLetCounter); //OK
 
-		System.out.println("Optional Chaining: "+ optionalChainingCounter);
-		System.out.println("Forced Unwrapping: "+ forcedUnwrappingsCounter);
+		System.out.println("Optional Chaining: "+ optionalChainingCounter); //OK
+		System.out.println("Forced Unwrapping: "+ forcedUnwrappingsCounter); //OK
 		System.out.println("== nil, != nil: "+ equalsNilCounter); //OK
 		System.out.println("??: "+ nilCoalescingCounter); //OK
 
 		System.out.println("as?: "+ optionalTypeCastingCounter); //OK
 		System.out.println("as!: "+ forcedTypeCastingCounter); //OK
 
-		System.out.println("Total types: "+ typeMap.size()); //OK
-		System.out.println("Optional Types: "+ optionalTypeMap.size());
-		System.out.println("Implicit Unwrapped Types: "+ forcedTypeMap.size());
-
+		System.out.println("Do Blocks: "+ doBlockCounter); //OK
 		System.out.println("Try: "+ tryCounter); //OK
 		System.out.println("Try?: "+ optionalTryCounter); //OK
 		System.out.println("Try!: "+ forcedTryCounter); //OK
+		System.out.println("Throw: "+ throwCounter); //OK
+		System.out.println("Throws: "+ throwsCounter); //OK
+		System.out.println("Rethrows: "+ rethrowsCounter); //OK
+		System.out.println("Catch: "+ catchCounter); //OK
+		
+		Map<String, Integer> fixedMap = removeDuplicatedValues(removeDuplicatedValues(typeMap, optionalTypeMap), forcedTypeMap);
+		
+		System.out.println("Normal types : "+ fixedMap.size());
+		System.out.println("Optional Types: "+ optionalTypeMap.size()); //OK
+		System.out.println("Implicit Unwrapped Types: "+ forcedTypeMap.size()); //OK
 
 	}
 	

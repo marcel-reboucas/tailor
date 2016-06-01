@@ -17,6 +17,7 @@ import com.sleekbyte.tailor.listeners.BlankLineListener;
 import com.sleekbyte.tailor.listeners.BraceStyleListener;
 import com.sleekbyte.tailor.listeners.ErrorListener;
 import com.sleekbyte.tailor.listeners.FileListener;
+import com.sleekbyte.tailor.listeners.MscrMetricsListener;
 import com.sleekbyte.tailor.listeners.TodoCommentListener;
 import com.sleekbyte.tailor.listeners.lengths.MaxLengthListener;
 import com.sleekbyte.tailor.listeners.lengths.MinLengthListener;
@@ -26,6 +27,7 @@ import com.sleekbyte.tailor.output.ViolationSuppressor;
 import com.sleekbyte.tailor.utils.CLIArgumentParser.CLIArgumentParserException;
 import com.sleekbyte.tailor.utils.CommentExtractor;
 import com.sleekbyte.tailor.utils.Configuration;
+
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
@@ -321,16 +323,17 @@ public final class Tailor {
             });
         formatter.printProgressInfo(String.format("%n"));
 
-        printersForAllFiles.forEach(printer -> {
-                try {
-                    printer.printAllMessages();
-                } catch (IOException e) {
-                    handleIOException(e);
-                }
-            });
-
-        formatter.displaySummary(fileNames.size(), numSkippedFiles.get(), numErrors.get(), numWarnings.get());
-        handleErrorViolations(formatter, numErrors.get());
+//        printersForAllFiles.forEach(printer -> {
+//                try {
+//                    printer.printAllMessages();
+//                } catch (IOException e) {
+//                    handleIOException(e);
+//                }
+//            });
+//
+//        formatter.displaySummary(fileNames.size(), numSkippedFiles.get(), numErrors.get(), numWarnings.get());
+//        handleErrorViolations(formatter, numErrors.get());
+        MscrMetricsListener.printSummary();
     }
 
     /**
